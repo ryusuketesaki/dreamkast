@@ -12,35 +12,65 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     steps:
-      - uses: actions/checkout@v3
-
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Set up Docker Buildx
-        id: buildx
         uses: docker/setup-buildx-action@v2
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
         with:
-          images: 607167088920.dkr.ecr.ap-northeast-1.amazonaws.com/dreamkast-ecs
-          tags: |
-            type=sha,prefix=,format=long
-            type=ref,event=branch
+          registry: ghcr.io
+          username: "ryusuketesaki"
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare-tag
+        id: tags
+        run: |
+          arch=""
+          # https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context
+          case "${{ runner.arch }}" in
+            "X64" ) arch="amd64" ;;
+            "ARM64" ) arch="arm64" ;;
+          esac
 
-      # - name: Build
-      #   id: docker_build
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     context: ./
-      #     file: ./Dockerfile
-      #     builder: ${{ steps.buildx.outputs.name }}
-      #     push: false
-      #     platforms: linux/amd64,linux/arm64
-      #     provenance: false
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     cache-from: type=gha
-      #     cache-to: type=gha,mode=max
+          echo "tag=${{ github.sha }}-${arch}" >> $GITHUB_OUTPUT
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ghcr.io/ryusuketesaki/dreamkast-ecs-buidtest:${{ steps.tags.outputs.tag }}
+          provenance: false
+
+    # steps:
+    #   - uses: actions/checkout@v3
+
+    #   - name: Set up Docker Buildx
+    #     id: buildx
+    #     uses: docker/setup-buildx-action@v2
+
+    #   - name: Docker meta
+    #     id: meta
+    #     uses: docker/metadata-action@v4
+    #     with:
+    #       # images: 607167088920.dkr.ecr.ap-northeast-1.amazonaws.com/dreamkast-ecs
+    #       images: 607167088920.dkr.ecr.ap-northeast-1.amazonaws.com/dreamkast-ecs
+    #       tags: |
+    #         type=sha,prefix=,format=long
+    #         type=ref,event=branch
+
+    #   - name: Build
+    #     id: docker_build
+    #     uses: docker/build-push-action@v4
+    #     with:
+    #       context: ./
+    #       file: ./Dockerfile
+    #       builder: ${{ steps.buildx.outputs.name }}
+    #       push: false
+    #       platforms: linux/amd64,linux/arm64
+    #       provenance: false
+    #       tags: ${{ steps.meta.outputs.tags }}
+    #       labels: ${{ steps.meta.outputs.labels }}
+    #       cache-from: type=gha
+    #       cache-to: type=gha,mode=max
 
       # - name: Run Trivy vulnerability scanner
       #   uses: aquasecurity/trivy-action@master
