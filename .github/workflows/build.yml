@@ -4,7 +4,9 @@ on: push
 
 jobs:
   build:
-    runs-on: buildjet-4vcpu-ubuntu-2204
+    runs-on:
+      - "ubuntu-latest"
+      - "buildjet-2vcpu-ubuntu-2204-arm"
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     steps:
       - uses: actions/checkout@v3
