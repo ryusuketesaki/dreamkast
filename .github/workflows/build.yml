@@ -4,9 +4,12 @@ on: push
 
 jobs:
   build:
-    runs-on:
-      - "ubuntu-latest"
-      - "buildjet-2vcpu-ubuntu-2204-arm"
+    strategy:
+      matrix: 
+        runs-on:
+          - "ubuntu-latest"
+          - "buildjet-2vcpu-ubuntu-2204-arm"
+    runs-on: ${{ matrix.runs-on }}
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     steps:
       - uses: actions/checkout@v3
