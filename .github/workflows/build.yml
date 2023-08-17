@@ -55,14 +55,14 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v4
         with:
-          context: ./
-          file: ./Dockerfile
+          # context: ./
+          # file: ./Dockerfile
           push: true
           tags: ${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ steps.tags.outputs.tag }}
           provenance: false
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # labels: ${{ steps.meta.outputs.labels }}
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
 
 
 
