@@ -87,14 +87,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs
+          tags: |
+            type=sha,prefix=,format=long
+            type=ref,event=branch
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       - name: Create a New Image
         run: |
-          image_tag="${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ github.sha }},${{needs.build.outputs.Docker_meta_tag}}"
+          image_tag="${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ github.sha }}, ${{ steps.meta.outputs.tags }}"
           echo $image_tag
-          echo ${{needs.build.outputs.Docker_meta_tag}}
+          echo  ${{ steps.meta.outputs.tags }}
 
           # docker buildx imagetools create \
           #   --tag ${image_tag} \
