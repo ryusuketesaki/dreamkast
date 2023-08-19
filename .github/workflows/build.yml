@@ -42,8 +42,6 @@ jobs:
             type=sha,prefix=,format=long
             type=ref,event=branch
 
-      - name: Set tag output
-        run: echo "Docker_meta_tag=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
 
       - name: Prepare-tag
         id: tags
