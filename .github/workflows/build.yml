@@ -12,6 +12,8 @@ jobs:
           - "buildjet-4vcpu-ubuntu-2204-arm"
     runs-on: ${{ matrix.runs-on }}
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
+    outputs:
+      Docker_meta_tag: ${{ steps.meta.output.Docker_meta_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -50,7 +52,7 @@ jobs:
             "ARM64" ) arch="arm64" ;;
           esac
 
-          echo "tag=${{ github.sha }}-${arch}, ${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
+          echo "tag=${{ github.sha }}-${arch}" >> $GITHUB_OUTPUT
 
       - name: Build
         id: docker_build
@@ -59,7 +61,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ steps.tags.outputs.tag }}
+          tags: ${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ steps.tags.outputs.tag }}, ${{ steps.meta.outputs.tags }}
           provenance: false
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -87,7 +89,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
       - name: Create a New Image
         run: |
-          image_tag="${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ github.sha }}"
+          image_tag="${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ github.sha }},${{needs.build.outputs.Docker_meta_tag}}"
 
           docker buildx imagetools create \
             --tag ${image_tag} \
