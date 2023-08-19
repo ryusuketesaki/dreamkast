@@ -8,8 +8,8 @@ jobs:
       matrix: 
         runs-on:
           - "ubuntu-latest"
-          - "buildjet-2vcpu-ubuntu-2204-arm"
-          # - "ubuntu-latest"
+          # - "buildjet-2vcpu-ubuntu-2204-arm"
+          - "ubuntu-latest"
     runs-on: ${{ matrix.runs-on }}
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     outputs:
@@ -105,7 +105,7 @@ jobs:
 
           docker buildx imagetools create \
             --tag ${image_tag_sha} --tag ${image_tag_ref}\
-            ${image_tag_sha}-arm64 \
+            ${image_tag_sha}-amd64 \
             ${image_tag_sha}-amd64
 
       - name: Run Trivy vulnerability scanner
