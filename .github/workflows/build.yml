@@ -54,18 +54,18 @@ jobs:
 
           echo "tag=${{ github.sha }}-${arch}" >> $GITHUB_OUTPUT
 
-      - name: Build
-        id: docker_build
-        uses: docker/build-push-action@v4
-        with:
-          context: ./
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ steps.tags.outputs.tag }}, ${{ steps.meta.outputs.tags }}
-          provenance: false
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Build
+      #   id: docker_build
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: ./
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ steps.tags.outputs.tag }}, ${{ steps.meta.outputs.tags }}
+      #     provenance: false
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
 
 
@@ -90,11 +90,13 @@ jobs:
       - name: Create a New Image
         run: |
           image_tag="${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ github.sha }},${{needs.build.outputs.Docker_meta_tag}}"
+          echo ${image_tag}
+          echo ${{needs.build.outputs.Docker_meta_tag}}
 
-          docker buildx imagetools create \
-            --tag ${image_tag} \
-            ${image_tag}-arm64 \
-            ${image_tag}-amd64
+          # docker buildx imagetools create \
+          #   --tag ${image_tag} \
+          #   ${image_tag}-arm64 \
+          #   ${image_tag}-amd64
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
