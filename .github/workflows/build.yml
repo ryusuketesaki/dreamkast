@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     outputs:
-      Docker_meta_tag: ${{ steps.meta.output.Docker_meta_tag }}
+      Docker_meta_tag: ${{ steps.meta.outputs.Docker_meta_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -90,7 +90,7 @@ jobs:
       - name: Create a New Image
         run: |
           image_tag="${{ steps.login-ecr.outputs.registry }}/dreamkast-ecs:${{ github.sha }},${{needs.build.outputs.Docker_meta_tag}}"
-          echo ${image_tag}
+          echo $image_tag
           echo ${{needs.build.outputs.Docker_meta_tag}}
 
           # docker buildx imagetools create \
