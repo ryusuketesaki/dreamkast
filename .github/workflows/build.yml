@@ -9,7 +9,7 @@ jobs:
         runs-on:
           - "ubuntu-latest"
           # - "buildjet-2vcpu-ubuntu-2204-arm"
-          - "buildjet-4vcpu-ubuntu-2204-arm"
+          - "ubuntu-latest"
     runs-on: ${{ matrix.runs-on }}
     if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     outputs:
